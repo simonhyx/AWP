@@ -26,8 +26,9 @@ int mode;
 
 
 
-resource_t* ar;
+resource_t ar[1000];
 int cap;
+int offset;
 
 
 
@@ -77,10 +78,10 @@ void initialize_meetup(int n, int mf) {
     }
 
 
-        ar = (resource_t*)erealloc(NULL, sizeof(resource_t*)*10);
-        cap = 10;
+        //ar = (resource_t*)emalloc( sizeof(resource_t*)*1);
+        cap = 1;
 
-
+	offset =0;
 	pthread_mutex_init(&key, NULL);
 	int ret = pthread_cond_init(&m,NULL);
 	SizeofHips = n;
@@ -116,20 +117,16 @@ void join_meetup(char *value, int len) {
 		int mygen = generation;
 
 
-
                 resource_t* word = ar;
-                word = word + mygen;
+                word = word + mygen ;
 //xit(1);
                 if (mode == 1 && count == 1){ // if in meet first mode store the code word for the first person
                         // check if the generation number is greater than the size of the vector 
                         // if yes, re-size
 
-                        if (mygen + 1 > cap){
-                                int k = 2 * cap;
-                                ar = realloc(ar,k * sizeof(resource_t));
-                        }  // resize complete, then must check if realloc is successful. 
+
 printf("\non line 157 writing value = %s\n", value);
-                        write_resource(word, value, strlen(value));
+                        write_resource(word, value, strlen(value)+1);
                 }
 
 
@@ -141,30 +138,11 @@ printf("\non line 157 writing value = %s\n", value);
 		while(mygen == generation){
 			pthread_cond_wait(&m, &key);
 		}
-//		resource_t* word = ar;
-//		word = word + mygen;
-//xit(1);
-		if (mode == 1 && count == 1){ // if in meet first mode store the code word for the first person
-			// check if the generation number is greater than the size of the vector 
-			// if yes, re-size
 
-			if (mygen + 1 > cap){
-				int k = 2 * cap;
-				ar = realloc(ar,k * sizeof(resource_t));
-			}  // resize complete, then must check if realloc is successful. 
-printf("\non line 157 writing value = %s\n", value);
-			write_resource(word, value, strlen(value));
-		}
-		// read word
-		// for both meet first and meet last ?
-		// read the word corresponding to your generation only
-		
 		char * temp = word-> value;
 		printf("temp = %s\n value = %s\n", temp,value);
-		read_resource(word, value,strlen(temp));
-		if (word->num_reads == SizeofHips){ // once the final read is issued free the variable
-			//free(word);
-		}
+		read_resource(word, value,strlen(temp)+1);
+
 		
 	}else{
 
@@ -173,22 +151,14 @@ printf("\non line 157 writing value = %s\n", value);
 		word = word + generation;
 
 		if (mode == 0){ // if in meet last mode store the code word for the first person
-			// check if the generation number is greater than the size of the vector 
-			// if yes, re-size
-			if (generation + 1 > cap){
-				int k = 2 * cap;
-				ar = realloc(ar,k * sizeof(resource_t));
-			}  // resize complete, then must check if realloc is successful. 
 			printf("\nLine 184 writing value = %s\n",value);
-			write_resource(word, value, strlen(value));
+			write_resource(word, value, strlen(value)+1);
 			
 		}
 		char * temp = word-> value;
 printf("on line 185 temp = %s\n, value = %s\n",temp ,value);
-		read_resource(word, value,strlen(temp));
-		if (word->num_reads == SizeofHips){ // once the final read is issued free the variable
-			//free(word);
-		}
+		read_resource(word, value,strlen(temp)+1);
+
 
 
 		count = 0;
